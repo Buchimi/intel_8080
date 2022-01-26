@@ -1,3 +1,7 @@
+mod cpu;
+mod registers;
+
 fn main() {
-    println!("Hello, world!");
+    let mut cpu = cpu::CPU::init_cpu();
+    cpu.tick();
 }
