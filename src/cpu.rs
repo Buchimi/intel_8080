@@ -301,20 +301,33 @@ impl CPU {
 
     }
 
+    // Reg C == byte 2
+    // Reg B == Byte 3
     fn lxi(&mut self) {
-
+        self.regs.C = self.fetch();
+        self.regs.B = self.fetch();
     }
 
+    // Load value of reg A into location returned by BC
     fn stax(&mut self) {
+        let location = self.regs.return_joined_regs("BC");
 
+        self.ram[location as usize] = self.regs.A;
     }
 
+    // Increment BC by 1
     fn inx(&mut self) {
+        let mut bc = self.regs.return_joined_regs("BC");
+        bc += 1;
 
+        let bc_tup = self.regs.split_regs(bc);
+
+        self.regs.B = bc_tup.0;
+        self.regs.B = bc_tup.1;
     }
 
     fn inr(&mut self) {
-
+        
     }
 
     fn dcr(&mut self) {
