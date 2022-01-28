@@ -34,7 +34,7 @@ impl CPU {
     fn decode(&mut self, inst: u8) {
         match inst {
             0x00 => {self.nop()},
-            0x01 => {self.lxi()},
+            0x01 => {self.lxi("B")},
             0x02 => {self.stax()},
             0x03 => {self.inx()},
             0x04 => {self.inr()},
@@ -301,41 +301,83 @@ impl CPU {
 
     }
 
+    // Load the immediate 16 bit value to reg pair 
     // Reg C == byte 2
     // Reg B == Byte 3
-    fn lxi(&mut self) {
-        self.regs.C = self.fetch();
-        self.regs.B = self.fetch();
+    fn lxi(&mut self, reg: &str){
+        match reg {
+            "B" => {   
+                self.regs.C = self.fetch();
+                self.regs.B = self.fetch();
+            }
+            _ => {}
+        };
     }
 
-    // Load value of reg A into location returned by BC
-    fn stax(&mut self) {
-        let location = self.regs.return_joined_regs("BC");
+    // Load value of reg A into location returned by reg pair
+    fn stax(&mut self, reg: &str) {
+        let location = if reg == "B" {
+            self.regs.return_joined_regs("BC")
+        } else if reg == "D" {
+            self.regs.return_joined_regs("DE")
+        }  else if reg == "H" {
+            self.regs.return_joined_regs("HL")
+        } else {
+            0
+        };
 
         self.ram[location as usize] = self.regs.A;
     }
 
-    // Increment BC by 1
-    fn inx(&mut self) {
-        let mut bc = self.regs.return_joined_regs("BC");
-        bc += 1;
+    // Increment reg pair by 1
+    fn inx(&mut self, reg: &str) {
+        let mut reg_pair = if reg == "B" {
+            self.regs.return_joined_regs("BC")
+        } else if reg == "D" {
+            self.regs.return_joined_regs("DE")
+        }  else if reg == "H" {
+            self.regs.return_joined_regs("HL")
+        } else {
+            0
+        };
 
-        let bc_tup = self.regs.split_regs(bc);
+        reg_pair += 1;
 
-        self.regs.B = bc_tup.0;
-        self.regs.B = bc_tup.1;
+        // Convert register pair into tuple for easier splitting
+        let reg_pair_tup = self.regs.split_regs(reg_pair);
+
+        self.regs.B = reg_pair_tup.0;
+        self.regs.B = reg_pair_tup.1;
     }
 
-    fn inr(&mut self) {
-        
+    // Increment register
+    fn inr(&mut self, reg: &str) {
+        match reg {
+            "B" => {self.regs.B += 1},
+            "C" => {self.regs.C += 1},
+            "D" => {self.regs.D += 1},
+            "E" => {self.regs.E += 1},
+            "H" => {self.regs.H += 1},
+            "L" => {self.regs.L += 1},
+            _ => {}
+        };
     }
 
-    fn dcr(&mut self) {
-
+    // Decrement register
+    fn dcr(&mut self, reg: &str) {
+        match reg {
+            "B" => {self.regs.B -= 1},
+            "C" => {self.regs.C -= 1},
+            "D" => {self.regs.D -= 1},
+            "E" => {self.regs.E -= 1},
+            "H" => {self.regs.H -= 1},
+            "L" => {self.regs.L -= 1},
+            _ => {}
+        };
     }
 
     fn mvi(&mut self) {
-
+        
     }
 
     fn rlc(&mut self) {
