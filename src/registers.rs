@@ -7,7 +7,18 @@ pub struct Regs {
     pub E: u8,
     pub H: u8,
     pub L: u8,
-    pub F: u8,
+    pub PSW: Flags,
+}
+
+#[derive(Debug)]
+pub struct Flags {
+    pub C: bool,
+    pub V: bool,
+    pub P: bool,
+    pub A: bool,
+    pub K: bool,
+    pub Z: bool,
+    pub S: bool,
 }
 
 impl Regs {
@@ -20,7 +31,15 @@ impl Regs {
             E: 0,
             H: 0,
             L: 0,
-            F: 0,
+            PSW: Flags {
+                C: false,
+                V: false,
+                P: false,
+                A: false,
+                K: false,
+                Z: false,
+                S: false,
+            },
         }
     }
 
@@ -47,7 +66,6 @@ impl Regs {
         return val;
     }
 
-
     // Take the u16 value of 2 regs
     // Shift the hi byte and turn it into a u8
     // Bitwise & the lo byte to leave a u8
@@ -57,7 +75,20 @@ impl Regs {
         let lo = (x & 0x0F) as u8;
 
         let regs = (hi, lo);
-        
-        return regs
+
+        return regs;
+    }
+
+    pub fn set_flags(&mut self, flag: &str) {
+        match flag {
+            "C" => self.PSW.C = true,
+            "V" => self.PSW.V = true,
+            "P" => self.PSW.P = true,
+            "A" => self.PSW.A = true,
+            "K" => self.PSW.K = true,
+            "Z" => self.PSW.Z = true,
+            "S" => self.PSW.S = true,
+            _ => {}
+        }
     }
 }
