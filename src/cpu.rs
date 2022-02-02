@@ -369,13 +369,89 @@ impl CPU {
     fn inr(&mut self, reg: &str) {
         let addr = self.return_byte_at_location("HL");
         match reg {
-            "B" => self.regs.B = self.regs.B.overflowing_add(1).0,
-            "C" => self.regs.C = self.regs.C.overflowing_add(1).0,
-            "D" => self.regs.D = self.regs.D.overflowing_add(1).0,
-            "E" => self.regs.E = self.regs.E.overflowing_add(1).0,
-            "H" => self.regs.H = self.regs.H.overflowing_add(1).0,
-            "L" => self.regs.L = self.regs.L.overflowing_add(1).0,
-            "M" => self.ram[addr as usize] += 1,
+            "B" => {
+                self.regs.B = self.regs.B.overflowing_add(1).0;
+                if self.regs.B == 0 {
+                    self.regs.set_flags("Z", true);
+                } else if 
+                self.regs.B != 0 {
+                    self.regs.set_flags("Z", false)
+                };
+                self.regs.set_s_flags(self.regs.B);
+                self.regs.check_parity(self.regs.B);
+            }
+            "C" => {
+                self.regs.C = self.regs.C.overflowing_add(1).0;
+                if self.regs.C == 0 {
+                    self.regs.set_flags("Z", true);
+                } else if 
+                self.regs.C != 0 {
+                    self.regs.set_flags("Z", false)
+                };
+                self.regs.set_s_flags(self.regs.C);
+                self.regs.check_parity(self.regs.C);
+
+            }
+            "D" => {
+                self.regs.D = self.regs.D.overflowing_add(1).0;
+                if self.regs.D == 0 {
+                    self.regs.set_flags("Z", true);
+                } else if 
+                self.regs.D != 0 {
+                    self.regs.set_flags("Z", false)
+                };
+                self.regs.set_s_flags(self.regs.D);
+                self.regs.check_parity(self.regs.D);
+
+            }
+            "E" => {
+                self.regs.E = self.regs.E.overflowing_add(1).0;
+                if self.regs.E == 0 {
+                    self.regs.set_flags("Z", true);
+                } else if 
+                self.regs.E != 0 {
+                    self.regs.set_flags("Z", false)
+                };
+                self.regs.set_s_flags(self.regs.E);
+                self.regs.check_parity(self.regs.E);
+
+            }
+            "H" => {
+                self.regs.H = self.regs.H.overflowing_add(1).0;
+                if self.regs.H == 0 {
+                    self.regs.set_flags("Z", true);
+                } else if 
+                self.regs.H != 0 {
+                    self.regs.set_flags("Z", false)
+                };
+                self.regs.set_s_flags(self.regs.H);
+                self.regs.check_parity(self.regs.H);
+
+            }
+            "L" => {
+                self.regs.L = self.regs.L.overflowing_add(1).0;
+                if self.regs.L == 0 {
+                    self.regs.set_flags("Z", true);
+                } else if 
+                self.regs.L != 0 {
+                    self.regs.set_flags("Z", false)
+                };
+                self.regs.set_s_flags(self.regs.L);
+                self.regs.check_parity(self.regs.L);
+
+            }
+            "M" => {
+                self.ram[addr as usize] += 1;
+                if self.ram[addr as usize] == 0 {
+                    self.regs.set_flags("Z", true);
+                } else if 
+                self.ram[addr as usize] != 0 {
+                    self.regs.set_flags("Z", false)
+                };
+                self.regs.set_s_flags(self.ram[addr as usize]);
+                self.regs.check_parity(self.ram[addr as usize]);
+
+            }
             _ => {}
         }
     }
@@ -384,15 +460,70 @@ impl CPU {
     fn dcr(&mut self, reg: &str) {
         let addr = self.return_byte_at_location("HL");
         match reg {
-            "B" => self.regs.B = self.regs.B.overflowing_sub(1).0,
-            "C" => self.regs.C = self.regs.C.overflowing_sub(1).0,
-            "D" => self.regs.D = self.regs.D.overflowing_sub(1).0,
-            "E" => self.regs.E = self.regs.E.overflowing_sub(1).0,
-            "H" => self.regs.H = self.regs.H.overflowing_sub(1).0,
-            "L" => self.regs.L = self.regs.L.overflowing_sub(1).0,
-            "M" => self.ram[addr as usize] += 1,
+            "B" => {
+                self.regs.B = self.regs.B.overflowing_sub(1).0;
+                if self.regs.B == 0 {
+                    self.regs.set_flags("Z", true);
+                };
+                self.regs.set_s_flags(self.regs.B);
+                self.regs.check_parity(self.regs.B);
+            }
+            "C" => {
+                self.regs.C = self.regs.C.overflowing_sub(1).0;
+                if self.regs.C == 0 {
+                    self.regs.set_flags("Z", true);
+                };
+                self.regs.set_s_flags(self.regs.C);
+                self.regs.check_parity(self.regs.C);
+
+            }
+            "D" => {
+                self.regs.D = self.regs.D.overflowing_sub(1).0;
+                if self.regs.D == 0 {
+                    self.regs.set_flags("Z", true);
+                };
+                self.regs.set_s_flags(self.regs.D);
+                self.regs.check_parity(self.regs.D);
+
+            }
+            "E" => {
+                self.regs.E = self.regs.E.overflowing_sub(1).0;
+                if self.regs.E == 0 {
+                    self.regs.set_flags("Z", true);
+                };
+                self.regs.set_s_flags(self.regs.E);
+                self.regs.check_parity(self.regs.E);
+
+            }
+            "H" => {
+                self.regs.H = self.regs.H.overflowing_sub(1).0;
+                if self.regs.H == 0 {
+                    self.regs.set_flags("Z", true);
+                };
+                self.regs.set_s_flags(self.regs.H);
+                self.regs.check_parity(self.regs.H);
+
+            }
+            "L" => {
+                self.regs.L = self.regs.L.overflowing_sub(1).0;
+                if self.regs.L == 0 {
+                    self.regs.set_flags("Z", true);
+                };
+                self.regs.set_s_flags(self.regs.L);
+                self.regs.check_parity(self.regs.L);
+
+            }
+            "M" => {
+                self.ram[addr as usize] -= 1;
+                if self.ram[addr as usize] == 0 {
+                    self.regs.set_flags("Z", true);
+                };
+                self.regs.set_s_flags(self.ram[addr as usize]);
+                self.regs.check_parity(self.ram[addr as usize]);
+
+            }
             _ => {}
-        };
+        }
     }
 
     // Reg B = next byte fetched
@@ -414,33 +545,50 @@ impl CPU {
 
     // Rotate A left
     fn rlc(&mut self) {
-        self.regs.A = self.regs.A.rotate_left(7);
+        if self.regs.A & 0b10000000 == 1 {
+            self.regs.set_flags("C", true);
+            self.regs.A <<= 1;
+            self.regs.A |= 0b00000001;
+        } else if 
+            self.regs.A & 0b10000000 == 0 {
+                self.regs.set_flags("C", false);
+                self.regs.A << 1;
+                self.regs.A != 0b00000001;
+            };
     }
 
     // Register pair is added to HL
     fn dad(&mut self, reg: &str) {
         let mut hl = self.regs.return_joined_regs("HL");
+
         let reg_to_add_to_hl = match reg {
             "B" => self.regs.return_joined_regs("BC"),
             "D" => self.regs.return_joined_regs("DE"),
             "H" => self.regs.return_joined_regs("HL"),
             _ => 0,
         };
+
+        let num = hl.overflowing_add(reg_to_add_to_hl);
+        if num.1 {
+            self.regs.set_flags("C", true);
+        } else if !num.1 {
+            self.regs.set_flags("C", false)
+        };
+
+        let reg_as_tup = self.regs.split_regs(num.0);
+
         match reg {
             "B" => {
-                hl += reg_to_add_to_hl;
-                self.regs.H = self.regs.split_regs(hl).0;
-                self.regs.L = self.regs.split_regs(hl).0;
+                self.regs.B = reg_as_tup.0;
+                self.regs.C = reg_as_tup.1;
             }
             "D" => {
-                hl += reg_to_add_to_hl;
-                self.regs.H = self.regs.split_regs(hl).0;
-                self.regs.L = self.regs.split_regs(hl).0;
+                self.regs.D = reg_as_tup.0;
+                self.regs.E = reg_as_tup.1;
             }
             "H" => {
-                hl += reg_to_add_to_hl;
-                self.regs.H = self.regs.split_regs(hl).0;
-                self.regs.L = self.regs.split_regs(hl).0;
+                self.regs.H = reg_as_tup.0;
+                self.regs.L = reg_as_tup.1;
             }
             "SP" => {
                 self.sp += reg_to_add_to_hl;
@@ -475,6 +623,9 @@ impl CPU {
             };
 
             let result = reg_pair.overflowing_sub(1);
+            if result.1 {
+                self.regs.set_flags("C", true);
+            }
 
             // Convert register pair into tuple for easier splitting
             let reg_pair_tup = self.regs.split_regs(result.0);
@@ -482,7 +633,11 @@ impl CPU {
             self.regs.B = reg_pair_tup.0;
             self.regs.B = reg_pair_tup.1;
         } else {
-            self.sp = self.sp.overflowing_sub(1).0;
+            let result = self.sp.overflowing_sub(1); 
+            self.sp = result.0;
+            if result.1 {
+                self.regs.set_flags("C", true);
+            }
         }
     }
 
@@ -1240,9 +1395,8 @@ impl CPU {
     // Jump if S is set
     fn jm(&mut self) {
         if self.regs.PSW.S {
-        self.pc = self.return_addr();
+            self.pc = self.return_addr();
         } else {
-
         }
     }
 

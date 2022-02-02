@@ -13,6 +13,11 @@ fn main() {
     };
 
     println!("{}", y);
+
+    let mut x: u8 = 0b11001110;
+    x |= 0b00000001;
+
+    println!("{:b}", x);
 }
 
 fn add() -> u8 {

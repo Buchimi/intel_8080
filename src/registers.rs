@@ -33,7 +33,7 @@ impl Regs {
             L: 0,
             PSW: Flags {
                 C: false,
-                V: false,
+                V: true,
                 P: false,
                 A: false,
                 K: false,
@@ -79,8 +79,9 @@ impl Regs {
         return regs;
     }
 
-    pub fn set_flags(&mut self, flag: &str) {
-        match flag {
+    pub fn set_flags(&mut self, flag: &str, set: bool) {
+        if set == true {
+            match flag {
             "C" => self.PSW.C = true,
             "V" => self.PSW.V = true,
             "P" => self.PSW.P = true,
@@ -90,5 +91,35 @@ impl Regs {
             "S" => self.PSW.S = true,
             _ => {}
         }
+    } else if set == false {
+        match flag {
+            "C" => self.PSW.C = false,
+            "V" => self.PSW.V = false,
+            "P" => self.PSW.P = false,
+            "A" => self.PSW.A = false,
+            "K" => self.PSW.K = false,
+            "Z" => self.PSW.Z = false,
+            "S" => self.PSW.S = false,
+            _ => {}
+        }
+    }
+    }
+
+    pub fn set_s_flags(&mut self, byte: u8) {
+        if byte &0b10000000 == 1 {
+            self.set_flags("S", true)
+        } else {
+            self.set_flags("S", false)
+        };
+    }
+
+    pub fn check_parity(&mut self, byte: u8) {
+        let result = byte.count_ones() as u8;
+
+        if result == 2 | 4 | 6 | 8 {
+            self.set_flags("P", true)
+        } else {
+            self.set_flags("P", false)
+        };
     }
 }
