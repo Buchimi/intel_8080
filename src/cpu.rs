@@ -547,14 +547,11 @@ impl CPU {
     fn rlc(&mut self) {
         if self.regs.A & 0b10000000 == 1 {
             self.regs.set_flags("C", true);
-            self.regs.A <<= 1;
-            self.regs.A |= 0b00000001;
-        } else if 
-            self.regs.A & 0b10000000 == 0 {
-                self.regs.set_flags("C", false);
-                self.regs.A << 1;
-                self.regs.A != 0b00000001;
-            };
+            self.regs.A = self.regs.A.rotate_left(1);
+        } else {
+            self.regs.A = self.regs.A.rotate_left(1);
+            self.regs.set_flags("C", false);
+        };
     }
 
     // Register pair is added to HL
@@ -643,14 +640,36 @@ impl CPU {
 
     // Rotate reg A right
     fn rrc(&mut self) {
-        self.regs.A = self.regs.A.rotate_right(7);
+            if self.regs.A & 0b00000001 == 1 {
+                self.regs.A = self.regs.A.rotate_right(1);
+                self.regs.set_flags("C", true);
+            }
     }
 
     // Rotate reg A left with carry
-    fn ral(&mut self) {}
+    fn ral(&mut self) {
+        if self.regs.A & 0b10000000 == 1 {
+            self.regs.set_flags("C", true);
+            self.regs.A <<= 1;
+            self.regs.A |= 0b00000001;
+        } else if self.regs.A & 0b10000000 == 0 {
+            self.regs.set_flags("C", false);
+            self.regs.A <<= 1;
+        }
+    }
 
     // Rotate reg A right with carry
-    fn rar(&mut self) {}
+    fn rar(&mut self) {
+        if self.regs.A & 0b00000001 == 1 {
+            self.regs.set_flags("C", true);
+            self.regs.A >>= 1;
+            self.regs.A |= 0b10000000;
+        } else if self.regs.A & 0b00000001 == 0 {
+            self.regs.set_flags("C", false);
+            self.regs.A >>= 1;
+            self.regs.A &= !0b10000000;
+        }
+    }
 
     // Store HL at immediate address
     // ADDR = L
@@ -698,7 +717,7 @@ impl CPU {
 
     // Set carry flag
     fn stc(&mut self) {
-        self.regs.set_flags("C");
+        self.regs.set_flags("C", true);
     }
 
     // Load reg A to byte at addr
@@ -817,20 +836,150 @@ impl CPU {
     // Add register or memory to reg A
     fn add(&mut self, reg: &str) {
         match reg {
-            "B" => self.regs.A = self.regs.A.overflowing_add(self.regs.B).0,
-            "C" => self.regs.A = self.regs.A.overflowing_add(self.regs.C).0,
-            "D" => self.regs.A = self.regs.A.overflowing_add(self.regs.D).0,
-            "E" => self.regs.A = self.regs.A.overflowing_add(self.regs.E).0,
-            "H" => self.regs.A = self.regs.A.overflowing_add(self.regs.H).0,
-            "L" => self.regs.A = self.regs.A.overflowing_add(self.regs.L).0,
+            "B" => {
+                let result = self.regs.A.overflowing_add(self.regs.B);
+                self.regs.A = result.0;
+                
+                if result.1 {
+                    self.regs.set_flags("C", true);
+                } else if !result.1 {
+                    self.regs.set_flags("C", false)
+                }
+
+                if self.regs.A == 0 {
+                    self.regs.set_flags("Z", true);
+                };
+                
+                self.regs.set_s_flags(self.regs.A);
+                self.regs.check_parity(self.regs.A);
+            },
+            "C" => {
+                let result = self.regs.A.overflowing_add(self.regs.C);
+                self.regs.A = result.0;
+                
+                if result.1 {
+                    self.regs.set_flags("C", true);
+                } else if !result.1 {
+                    self.regs.set_flags("C", false)
+                }
+
+                if self.regs.A == 0 {
+                    self.regs.set_flags("Z", true);
+                };
+                
+                self.regs.set_s_flags(self.regs.A);
+                self.regs.check_parity(self.regs.A);
+},
+            "D" => {
+                let result = self.regs.A.overflowing_add(self.regs.D);
+                self.regs.A = result.0;
+                
+                if result.1 {
+                    self.regs.set_flags("C", true);
+                } else if !result.1 {
+                    self.regs.set_flags("C", false)
+                }
+
+                if self.regs.A == 0 {
+                    self.regs.set_flags("Z", true);
+                };
+                
+                self.regs.set_s_flags(self.regs.A);
+                self.regs.check_parity(self.regs.A);
+            },
+            "E" => {
+                let result = self.regs.A.overflowing_add(self.regs.E);
+                self.regs.A = result.0;
+                
+                if result.1 {
+                    self.regs.set_flags("C", true);
+                } else if !result.1 {
+                    self.regs.set_flags("C", false)
+                }
+
+                if self.regs.A == 0 {
+                    self.regs.set_flags("Z", true);
+                };
+                
+                self.regs.set_s_flags(self.regs.A);
+                self.regs.check_parity(self.regs.A);
+            },
+            "H" => {
+                let result = self.regs.A.overflowing_add(self.regs.H);
+                self.regs.A = result.0;
+                
+                if result.1 {
+                    self.regs.set_flags("C", true);
+                } else if !result.1 {
+                    self.regs.set_flags("C", false)
+                }
+
+                if self.regs.A == 0 {
+                    self.regs.set_flags("Z", true);
+                };
+                
+                self.regs.set_s_flags(self.regs.A);
+                self.regs.check_parity(self.regs.A);
+            },
+            "L" => {
+                let result = self.regs.A.overflowing_add(self.regs.L);
+                self.regs.A = result.0;
+                
+                if result.1 {
+                    self.regs.set_flags("C", true);
+                } else if !result.1 {
+                    self.regs.set_flags("C", false)
+                }
+
+                if self.regs.A == 0 {
+                    self.regs.set_flags("Z", true);
+                };
+                
+                self.regs.set_s_flags(self.regs.A);
+                self.regs.check_parity(self.regs.A);
+            },
             "M" => {
+                let result = self.regs.A.overflowing_add(self.return_byte_at_location("HL"));
+                
+                self.regs.A = result.0;
+                
+                if result.1 {
+                    self.regs.set_flags("C", true);
+                } else if !result.1 {
+                    self.regs.set_flags("C", false)
+                }
+
+                if self.regs.A == 0 {
+                    self.regs.set_flags("Z", true);
+                };
+                
+                self.regs.set_s_flags(self.regs.A);
+                self.regs.check_parity(self.regs.A);
+
+
                 self.regs.A = self
                     .regs
                     .A
                     .overflowing_add(self.return_byte_at_location("HL"))
-                    .0
+                    .0;
+
             }
-            "A" => self.regs.A = self.regs.A.overflowing_add(self.regs.A).0,
+            "A" => {
+                let result = self.regs.A.overflowing_add(self.regs.A);
+                self.regs.A = result.0;
+                
+                if result.1 {
+                    self.regs.set_flags("C", true);
+                } else if !result.1 {
+                    self.regs.set_flags("C", false)
+                }
+
+                if self.regs.A == 0 {
+                    self.regs.set_flags("Z", true);
+                };
+                
+                self.regs.set_s_flags(self.regs.A);
+                self.regs.check_parity(self.regs.A);},
             _ => {}
         }
     }
@@ -1018,42 +1167,42 @@ impl CPU {
         match reg {
             "B" => {
                 if self.regs.A - self.regs.B == 0 {
-                    self.regs.set_flags("P");
+                    self.regs.set_flags("P", true);
                 }
             }
             "C" => {
                 if self.regs.A - self.regs.C == 0 {
-                    self.regs.set_flags("P");
+                    self.regs.set_flags("P", true);
                 }
             }
             "D" => {
                 if self.regs.A - self.regs.D == 0 {
-                    self.regs.set_flags("P");
+                    self.regs.set_flags("P", true);
                 }
             }
             "E" => {
                 if self.regs.A - self.regs.E == 0 {
-                    self.regs.set_flags("P");
+                    self.regs.set_flags("P", true);
                 }
             }
             "H" => {
                 if self.regs.A - self.regs.H == 0 {
-                    self.regs.set_flags("P");
+                    self.regs.set_flags("P", true);
                 }
             }
             "L" => {
                 if self.regs.A - self.regs.L == 0 {
-                    self.regs.set_flags("P");
+                    self.regs.set_flags("P", true);
                 }
             }
             "M" => {
                 if self.regs.A - self.return_byte_at_location("HL") == 0 {
-                    self.regs.set_flags("P");
+                    self.regs.set_flags("P", true);
                 }
             }
             "A" => {
                 if self.regs.A - self.regs.A == 0 {
-                    self.regs.set_flags("P");
+                    self.regs.set_flags("P", true);
                 }
             }
             _ => {}

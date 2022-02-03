@@ -15,7 +15,8 @@ fn main() {
     println!("{}", y);
 
     let mut x: u8 = 0b11001110;
-    x |= 0b00000001;
+    x &= !0b10000000;
+    
 
     println!("{:b}", x);
 }
